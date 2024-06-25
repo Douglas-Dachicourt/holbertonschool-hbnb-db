@@ -1,0 +1,9 @@
+Flask
+validate_email_address
+requests
+pycountry
+Flask-HTTPAuth
+flask_swagger_ui
+gunicorn
+Flask-SQLAlchemy
+SQLAlchemy
