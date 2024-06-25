@@ -20,3 +20,5 @@ typing_extensions==4.12.2
 urllib3==2.2.2
 validate-email-address==1
 Werkzeug==3.0.3
+python-dotenv
+Flask-JWT-Extended

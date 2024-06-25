@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from persistence.datamanager import DataManager
 from validate_email_address import validate_email
+#from flask_jwt_extended import jwt_required, create_access_token, get_jwt_identity
 import json
 import datetime
 import os
@@ -10,6 +11,7 @@ datamanager = DataManager(flag=1)
 
 
 @user_api.route("/users", methods=["POST", 'GET'])
+#@jwt_required()
 def add_user():
     """
     Function used to create a new user, send it to the database datamanager
@@ -52,7 +54,8 @@ def add_user():
             return jsonify({"Error": "setting up new user"}), 500
         else:
             datamanager.save(new_user.to_dict())
-            return jsonify({"Success": "User added"}), 201
+            #access_token = create_access_token(identity=email)
+            return jsonify({"Success": "User added", "access_token" : "access_token"}), 201
 
     else:
         try:
@@ -66,6 +69,7 @@ def add_user():
 
 
 @user_api.route("/users/<string:id>", methods=['GET', 'DELETE', 'PUT'])
+#@jwt_required()
 def get_user(id):
     """
     Function used to read, update or delete a specific user's info
