@@ -8,7 +8,7 @@ class User(BaseModel, db.Model):
 
     __tablename__ = "users"
 
-    id = Column(String(256), nullable=False)
+    id = Column(String(256), nullable=False, primary_key=True)
     email = Column(String(256), nullable=False)
     password = Column(String(50), nullable=False)
     is_admin = Column(Boolean, default=False)
@@ -20,3 +20,4 @@ class User(BaseModel, db.Model):
         self.email = email
         self.first_name = first_name
         self.last_name = last_name
+        

@@ -1,5 +1,4 @@
 from flask import Blueprint, jsonify, request
-from models.users import User, db
 from persistence.datamanager import DataManager
 from validate_email_address import validate_email
 import json
@@ -16,6 +15,7 @@ def add_user():
     Function used to create a new user, send it to the database datamanager
     and read a list of existing users.
     """
+    from models.users import User
     if request.method == "POST":
         user_data = request.get_json()
         if not user_data:

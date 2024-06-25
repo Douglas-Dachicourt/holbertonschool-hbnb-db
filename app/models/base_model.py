@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+import datetime
 from flask import jsonify
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, String, Integer, DateTime
@@ -15,9 +15,9 @@ class BaseModel(Base):
     id = Column(Integer, primary_key=True)
     uniq_id = Column(String(256), unique=True, nullable=False,
                      default=str(uuid.uuid4()))
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow,
-                        onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow,
+                        onupdate=datetime.datetime.utcnow)
 
     def save(self):
         from app import db

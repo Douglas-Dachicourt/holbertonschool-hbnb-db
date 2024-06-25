@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from flask import Flask, current_app
 from api.user_api import user_api
 # from api.country_api import country_api
 # from api.place_api import place_api
@@ -12,9 +12,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 
 app = Flask(__name__)
-
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///development.db'
-
 db = SQLAlchemy(app)
 
 port = os.getenv("PORT")
@@ -40,4 +38,7 @@ app.register_blueprint(user_api)
 
 
 if __name__ == "__main__":
+    with app.app_context():
+        db.create_all()
+
     app.run(debug=True, host='0.0.0.0', port=port)
