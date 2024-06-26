@@ -140,13 +140,17 @@ class DataManager(IPersistenceManager):
         db.session.commit()
 
     def get_from_database(self, entity, id):
-        return db.session.query(entity).filter_by(uniq_id=id).first()
+        return db.session.query(entity).filter_by(id=id).first()
 
     def delete_from_database(self, entity, id):
-        db.session.query(entity).filter_by(uniq_id=id).delete()
-        db.session.commit()
+        entity_to_delete = db.session.query(entity).filter_by(id=id).first()
+        if entity_to_delete:
+            db.session.delete(entity_to_delete)
+            db.session.commit()
 
-    def update_database(self, entity, id):
-        entity_to_update = db.session.query(entity).filter_by(uniq_id=id).first()
-        entity_to_update.update(entity)
-        db.session.commit()
+    def update_database(self, entity, id, data):
+        entity_to_update = db.session.query(entity).filter_by(id=id).first()
+        if entity_to_update:
+            for key, value in data.items():
+                setattr(entity_to_update, key, value)
+            db.session.commit()

@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from persistence.datamanager import DataManager
 from validate_email_address import validate_email
+from uuid import UUID
 
 #from flask_jwt_extended import jwt_required, create_access_token, get_jwt_identity
 import json
@@ -60,19 +61,19 @@ def add_or_list_users():
             })
         return jsonify(user_list), 200
 
-@user_api.route("/users/<int:user_id>", methods=["GET", "PUT", "DELETE"])
+@user_api.route("/users/<user_id>", methods=["GET", "PUT", "DELETE"])
 def get_update_delete_user(user_id):
 
     from models.users import User
 
-    user = User.query.get(user_id)
+    user = User.query.filter_by(id=user_id).first()
 
     if not user:
         return jsonify({"error": "User not found"}), 404
 
     if request.method == "GET":
         return jsonify({
-            "id": user.id,
+            "id": str(user.id),
             "email": user.email,
             "first_name": user.first_name,
             "last_name": user.last_name
@@ -86,12 +87,12 @@ def get_update_delete_user(user_id):
         user.last_name = user_data.get("last_name", user.last_name)
 
         try:
-            datamanager.update(user)  # Mise à jour via DataManager
+            datamanager.update_database(User, user_id, user_data)  # Mise à jour via DataManager
             return jsonify({"message": "User updated successfully"}), 200
         except Exception as e:
             return jsonify({"error": f"Failed to update user: {str(e)}"}), 500
 
     elif request.method == "DELETE":
 
-        datamanager.delete(user)  # Suppression via DataManager
+        datamanager.delete_from_database(User, user_id)  # Suppression via DataManager
         return jsonify({"message": "User deleted successfully"})
