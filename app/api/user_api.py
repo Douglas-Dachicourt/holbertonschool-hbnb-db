@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from persistence.datamanager import DataManager
 from validate_email_address import validate_email
+
 #from flask_jwt_extended import jwt_required, create_access_token, get_jwt_identity
 import json
 import datetime
@@ -62,7 +63,6 @@ def add_or_list_users():
 def get_update_delete_user(user_id):
 
     from models.users import User
-
 
     user = User.query.get(user_id)
 

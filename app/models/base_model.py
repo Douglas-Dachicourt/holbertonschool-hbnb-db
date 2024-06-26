@@ -3,6 +3,7 @@ import datetime
 from flask import jsonify
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, String, Integer, DateTime
+from db import db
 
 Base = declarative_base()
 
@@ -20,13 +21,11 @@ class BaseModel(Base):
                         onupdate=datetime.datetime.utcnow)
 
     def save(self):
-        from app import db
 
         db.session.add(self)
         db.session.commit()
 
     def delete(self):
-        from app import db
 
         db.session.delete(self)
         db.session.commit()

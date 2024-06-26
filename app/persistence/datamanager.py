@@ -2,7 +2,7 @@ import json
 import datetime
 from persistence.ipersistencemanager import IPersistenceManager
 import os
-
+from db import db
 
 class DataManager(IPersistenceManager):
     """
@@ -136,24 +136,20 @@ class DataManager(IPersistenceManager):
             pass
 
     def save_to_database(self, entity):
-        from app import db
 
         db.session.add(entity)
         db.session.commit()
 
     def get_from_database(self, entity, id):
-        from app import db
 
         return db.session.query(entity).filter_by(uniq_id=id).first()
 
     def delete_from_database(self, entity, id):
-        from app import db
 
         db.session.query(entity).filter_by(uniq_id=id).delete()
         db.session.commit()
 
     def update_database(self, entity, id):
-        from app import db
 
         entity_to_update = db.session.query(entity).filter_by(uniq_id=id).first()
         entity_to_update.update(entity)
