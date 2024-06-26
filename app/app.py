@@ -56,8 +56,6 @@ app.register_blueprint(user_api)
 # app.register_blueprint(cities_api)
 
 
-
-
 if __name__ == "__main__":
     with app.app_context():
         logging.debug("Creating database tables...")

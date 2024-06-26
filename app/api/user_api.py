@@ -25,6 +25,7 @@ def add_or_list_users():
         email = user_data.get("email")
         first_name = user_data.get("first_name")
         last_name = user_data.get("last_name")
+        password = user_data.get("password")
 
         if not all([email, first_name, last_name]):
             return jsonify({"error": "Missing required field"}), 400
@@ -39,10 +40,10 @@ def add_or_list_users():
             return jsonify({"error": "User already exists"}), 409
 
         # Create a new User object
-        new_user = User(email=email, first_name=first_name, last_name=last_name)
+        new_user = User(email=email, first_name=first_name, last_name=last_name, password=password)
 
         try:
-            datamanager.save(new_user)  # Sauvegarde via DataManager
+            datamanager.save_to_database(new_user)  # Sauvegarde via DataManager
             return jsonify({"message": "User added successfully"}), 201
         except Exception as e:
             return jsonify({"error": f"Failed to add user: {str(e)}"}), 500

@@ -23,5 +23,17 @@ class User(BaseModel, db.Model):
         self.email = email
         self.first_name = first_name
         self.last_name = last_name
-        self.password=password
-        
+        self.password = password
+
+
+"""
+curl -X POST http://localhost:5000/users \
+     -H "Content-Type: application/json" \
+     -d '{
+           "email": "seth.s@example.com",
+           "first_name": "Seth",
+           "last_name": "S",
+           "password": "seddssssss"
+         }'
+
+"""         

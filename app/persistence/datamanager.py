@@ -136,21 +136,17 @@ class DataManager(IPersistenceManager):
             pass
 
     def save_to_database(self, entity):
-
         db.session.add(entity)
         db.session.commit()
 
     def get_from_database(self, entity, id):
-
         return db.session.query(entity).filter_by(uniq_id=id).first()
 
     def delete_from_database(self, entity, id):
-
         db.session.query(entity).filter_by(uniq_id=id).delete()
         db.session.commit()
 
     def update_database(self, entity, id):
-
         entity_to_update = db.session.query(entity).filter_by(uniq_id=id).first()
         entity_to_update.update(entity)
         db.session.commit()
