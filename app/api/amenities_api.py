@@ -25,25 +25,25 @@ def add_amenity():
         if not new_amenity:
             return jsonify({"Error": "setting up new amenity"}), 500
         else:
-            try:
+            existing_amenities = Amenity.query.filter_by(name=name).first()
+            if existing_amenities:
+                return jsonify({"Error": "Amenity already exists"}), 409
 
-                with open("/home/hbnb/hbnb_data/Amenity.json", 'r') as f:
+            new_amenity = Amenity(name=name)
 
-                    amenities = json.load(f)
-                for amenity in amenities:
-                    if amenity.get("name") == name:
-                        return jsonify({"Error": "Amenity already exists"}), 409
-            except Exception as e:
-                print(e)
-            datamanager.save(new_amenity.to_dict())
-            return jsonify({"Success": "Amenity added"},
-                        new_amenity.to_dict()), 201
+            datamanager.save_to_database(new_amenity)
+            return jsonify({"Success": "Amenity added"}), 201
     else:
         try:
-            with open("/home/hbnb/hbnb_data/Amenity.json", 'r', encoding='utf-8') as f:
-                amenities = json.load(f)
-                return jsonify(amenities), 200
-        except FileNotFoundError:
+            amenities = Amenity.query.all()
+            amenity_list = []
+            for amenity in amenities:
+                amenity_list.append({
+                    "id": amenity.id,
+                    "name": amenity.name
+                })
+            return jsonify(amenity_list), 200
+        except Exception as e:
             return jsonify({"Error": "No amenity found"}), 404
 
 
