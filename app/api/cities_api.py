@@ -15,46 +15,40 @@ def cities():
     """
     if request.method == "POST":
         city_data = request.get_json()
-        city_id = city_data.get('id')
-        city_name = city_data.get('name')
+        if not city_data:
+            return jsonify({"Error": "Problem during city creation."}), 400
 
-        if not city_id or not city_name:
-            return jsonify({"Error": "Invalid data"}), 400
+        name = city_data.get("name")
+        country = city_data.get("country_id")
+        if not name:
+            return jsonify({"Error": "Missing required field."}), 400
 
-        new_city = City(city_name, city_id).to_dict()
+        new_city = City(name, country)
+        if not new_city:
+            return jsonify({"Error": "setting up new city"}), 500
+        else:
+            existing_cities = City.query.filter_by(name=name).first()
+            if existing_cities:
+                return jsonify({"Error": "City already exists"}), 409
 
-        file_path = '/home/hbnb/hbnb_data/cities.json'
-        if not os.path.exists(file_path):
-            with open(file_path, 'w', encoding='utf-8') as f:
-                json.dump([], f, ensure_ascii=False, indent=4)
+            new_city = City(name=name, country_id=country)
 
-        with open(file_path, 'r+', encoding='utf-8') as f:
-            try:
-                data = json.load(f)
-            except json.JSONDecodeError:
-                data = []
-
-            for entry in data:
-                if entry.get('id') == city_id:
-                    # Check if the city already exists
-                    if any(
-                            city['name'] == city_name for city in entry['city']):
-                        return jsonify({"Error": "City already exists"}), 400
-
-                    entry['city'].append(new_city)
-
-                    f.seek(0)
-                    json.dump(data, f, ensure_ascii=False, indent=4)
-                    f.truncate()
-
-                    return jsonify({"Success": "City added"}), 201
-
-            return jsonify({"Error": "Country ID not found"}), 404
+            datamanager.save_to_database(new_city)
+            return jsonify({"Success": "City added"}), 201
 
     if request.method == "GET":
-        with open('/home/hbnb/hbnb_data/cities.json', 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            return jsonify(data), 200
+        try:
+            cities = City.query.all()
+            city_list = []
+            for city in cities:
+                city_list.append({
+                    "id": city.id,
+                    "name": city.name,
+                    "country_id": city.country_id
+                })
+            return jsonify(city_list), 200
+        except Exception as e:
+            return jsonify({"Error": "No city found"}), 404
 
 
 @cities_api.route("/cities/<city_id>", methods=["GET", "DELETE", "PUT"])
@@ -64,33 +58,35 @@ def get_city(city_id):
     from the database
     """
     if request.method == "GET":
-        with open('/home/hbnb/hbnb_data/cities.json', 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            for entry in data:
-                for city in entry["city"]:
-                    if city.get('uniq_id') == city_id:
-                        return jsonify(city), 200
-            return jsonify({"Error": "City not found"}), 404
+        city = City.query.filter_by(id=city_id).first()
+        if city:
+            return jsonify({"id": str(city.id),
+                            "name": city.name,
+                            "country_id": city.country_id}), 200
+        return jsonify({"Error": "City not found"}), 404
     if request.method == "PUT":
         city_data = request.get_json()
-        with open('/home/hbnb/hbnb_data/cities.json', 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            for entry in data:
-                for city in entry["city"]:
-                    if city.get('uniq_id') == city_id:
-                        city['name'] = city_data.get('name')
-                        city["updated_at"] = datetime.datetime.now().isoformat()
-                        with open('/home/hbnb/hbnb_data/cities.json', 'w', encoding='utf-8') as f:
-                            json.dump(data, f, ensure_ascii=False, indent=4)
-                        return jsonify({"Success": "City updated"}, city), 200
-    if request.method == "DELETE":
-        with open('/home/hbnb/hbnb_data/cities.json', 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            for entry in data:
-                for city in entry["city"]:
-                    if city.get('uniq_id') == city_id:
-                        entry["city"].remove(city)
-                        with open('/home/hbnb/hbnb_data/cities.json', 'w', encoding='utf-8') as f:
-                            json.dump(data, f, ensure_ascii=False, indent=4)
-                        return jsonify({"Success": "City deleted"}), 200
+        if not city_data:
+            return jsonify({"Error": "Problem during city update."}), 400
+
+        name = city_data.get("name")
+        country = city_data.get("country_id")
+        if not name:
+            return jsonify({"Error": "Missing required field."}), 400
+
+        city = City.query.filter_by(id=city_id).first()
+        if not city:
             return jsonify({"Error": "City not found"}), 404
+
+        city.name = name
+        city.country_id = country
+
+        datamanager.update_database(City, city_id, city_data)
+        return jsonify({"Success": "City updated"}), 200
+    
+    if request.method == "DELETE":
+        city = City.query.filter_by(id=city_id).first()
+        if not city:
+            return jsonify({"Error": "City not found"}), 404
+        datamanager.delete_from_database(City, city_id)
+        return jsonify({"Success": "City deleted"}), 200

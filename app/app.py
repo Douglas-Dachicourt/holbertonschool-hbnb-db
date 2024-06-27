@@ -17,7 +17,7 @@ from api.user_api import user_api
 from api.place_api import place_api
 from api.amenities_api import amenities_api
 # from api.review_api import review_api
-# from api.cities_api import cities_api
+from api.cities_api import cities_api
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -54,7 +54,7 @@ app.register_blueprint(user_api)
 app.register_blueprint(place_api)
 app.register_blueprint(amenities_api)
 # app.register_blueprint(review_api)
-# app.register_blueprint(cities_api)
+app.register_blueprint(cities_api)
 
 
 if __name__ == "__main__":
