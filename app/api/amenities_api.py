@@ -54,31 +54,28 @@ def get_amenity(id):
     Function used to read, update or delete a specific amenity's info
     from the database
     """
+    amenities = Amenity.query.filter_by(id=id).first()
     if request.method == "GET":
-        amenities = datamanager.get("Amenity", id)
+        if amenities:
+            return jsonify({"id": str(amenities.id),
+            "name": amenities.name}), 200
         if not amenities:
             return jsonify({"Error": "Amenity not found"}), 404
-        return jsonify(amenities), 200
 
     if request.method == "DELETE":
-        amenities = datamanager.get("Amenities", id)
-        if not amenities:
-            return jsonify({"Error": "Amenity not found"}), 404
-        amenities = datamanager.delete("Amenities", id)
-        if not amenities:
+        if datamanager.delete_from_database(Amenity, id):
             return jsonify({"Success": "Amenity deleted"}), 200
+        else:
+            return jsonify({"Error": "Amenity not found"}), 404
+
 
     if request.method == "PUT":
+        if not amenities:
+            return jsonify({"Error": "Amenity not found"}), 404
         amenity_data = request.get_json()
-        amenity = datamanager.get("Amenity", id)
-        if not amenity:
-            return jsonify({"Error": "amenity not found"}), 404
+        amenities.name = amenity_data.get("name", amenities.name)
         try:
-            with open("/home/hbnb/hbnb_data/Amenity.json", 'r', encoding='UTF-8') as f:
-                if amenity_data["name"] in f.read():
-                    return jsonify({"Error": "Amenity already exists"}), 409
-        except FileNotFoundError:
-            pass
-        amenity["name"] = amenity_data["name"]
-        datamanager.update(amenity, id)
-        return jsonify({"Success": "Amenity updated"}, amenity), 200
+            datamanager.update_database(Amenity, id, amenity_data)
+            return jsonify({"Success": "Amenity updated"}), 200
+        except Exception as e:
+            return jsonify({"Error": "An error occurred"}), 500
