@@ -123,21 +123,20 @@ def get_place(id):
             return jsonify({"Success": "Place deleted"}), 200
 
     if request.method == "PUT":
-        place_data = request.get_json()
-        place = datamanager.get("Place", id)
         if not place:
-            return jsonify({"Error": "User not found"}), 404
-        place["name"] = place_data["name"]
-        place["description"] = place_data["description"]
-        place["address"] = place_data["address"]
-        place["latitude"] = place_data["latitude"]
-        place["longitude"] = place_data["longitude"]
-        place["num_rooms"] = place_data["num_rooms"]
-        place["num_bathrooms"] = place_data["num_bathrooms"]
-        place["price_per_night"] = place_data["price_per_night"]
-        place["max_guests"] = place_data["max_guests"]
-        place["host_id"] = place_data["host_id"]
-        place["amenity_ids"] = place_data["amenity_ids"]
-        place["city_id"] = place_data["city_id"]
-        datamanager.update(place, id)
-        return jsonify({"Success": "Place updated"}, place), 200
+            return jsonify({"Error": "Place not found"}), 404
+        place_data = request.get_json()
+        place.name = place_data.get("name", place.name)
+        place.description = place_data.get("description", place.description)
+        place.address = place_data.get("address", place.address)
+        place.city_id = place_data.get("city_id", place.city_id)
+        place.latitude = place_data.get("latitude", place.latitude)
+        place.longitude = place_data.get("longitude", place.longitude)
+        place.host_id = place_data.get("host_id", place.host_id)
+        place.num_rooms = place_data.get("num_rooms", place.num_rooms)
+        place.num_bathrooms = place_data.get("num_bathrooms", place.num_bathrooms)
+        place.price_per_night = place_data.get("price_per_night", place.price_per_night)
+        place.max_guests = place_data.get("max_guests", place.max_guests)
+        place.amenity_ids = place_data.get("amenity_ids", place.amenity_ids)
+        datamanager.update_database(Place, id, place_data)
+        return jsonify({"Success": "Place updated"}), 200
