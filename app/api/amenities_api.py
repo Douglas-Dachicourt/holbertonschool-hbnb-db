@@ -63,10 +63,11 @@ def get_amenity(id):
             return jsonify({"Error": "Amenity not found"}), 404
 
     if request.method == "DELETE":
-        if datamanager.delete_from_database(Amenity, id):
-            return jsonify({"Success": "Amenity deleted"}), 200
-        else:
+        if not amenities:
             return jsonify({"Error": "Amenity not found"}), 404
+        else:
+            datamanager.delete_from_database(Amenity, id)
+            return jsonify({"Success": "Amenity deleted"}), 200
 
 
     if request.method == "PUT":

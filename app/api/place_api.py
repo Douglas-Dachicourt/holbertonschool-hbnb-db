@@ -94,18 +94,32 @@ def get_place(id):
     Function used to read, update or delete a specific place's info
     from the database
     """
+    place = Place.query.filter_by(id=id).first()
     if request.method == "GET":
-        places = datamanager.get("Place", id)
-        if not places:
+        places = datamanager.get_from_database(Place, id)
+        if not place:
             return jsonify({"Error": "Place not found"}), 404
-        return jsonify(places), 200
+        return jsonify({
+            "id": str(places.id),
+            "name": places.name,
+            "description": places.description,
+            "address": places.address,
+            "city_id": places.city_id,
+            "latitude": places.latitude,
+            "longitude": places.longitude,
+            "host_id": places.host_id,
+            "num_rooms": places.num_rooms,
+            "num_bathrooms": places.num_bathrooms,
+            "price_per_night": places.price_per_night,
+            "max_guests": places.max_guests,
+            "amenity_ids": places.amenity_ids
+        }), 200
 
     if request.method == "DELETE":
-        places = datamanager.get("Places", id)
-        if not places:
-            return jsonify({"Error": "Place not found"}), 404
-        places = datamanager.delete("Places", id)
-        if not places:
+        if not place:
+            return jsonify({"Cannot": "find the place"}), 404
+        else:
+            datamanager.delete_from_database(Place, id)
             return jsonify({"Success": "Place deleted"}), 200
 
     if request.method == "PUT":
