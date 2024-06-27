@@ -1,8 +1,26 @@
 from models.base_model import BaseModel
+from sqlalchemy import String, Column, Float, Integer, DateTime, func
+from db import db
+import uuid
 
-
-class Place(BaseModel):
+class Place(BaseModel, db.Model):
     """Defines class Place that inherits from BaseModel"""
+
+    __tablename__ = "places"
+
+    id = Column(String(256), nullable=False, default=lambda: str(uuid.uuid4()), primary_key=True)
+    name = Column(String(256), nullable=False)
+    description = Column(String(1024), nullable=False)
+    address = Column(String(256), nullable=False)
+    city_id = Column(String(256), nullable=False)
+    latitude = Column(Float, nullable=False)
+    longitude = Column(Float, nullable=False)
+    host_id = Column(String(256), nullable=False)
+    num_rooms = Column(Integer, nullable=False)
+    num_bathrooms = Column(Integer, nullable=False)
+    price_per_night = Column(Float, nullable=False)
+    max_guests = Column(Integer, nullable=False)
+    amenity_ids = Column(String(256), nullable=True)
 
     def __init__(self, name, description, address, city_id, latitude,
                  longitude, host_id, num_rooms, num_bathrooms,

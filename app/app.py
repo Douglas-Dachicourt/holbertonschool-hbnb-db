@@ -6,6 +6,7 @@ from db import db
 
 from models.users import User
 from models.amenity import Amenity
+from models.place import Place
 #from flask_jwt_extended import JWTManager
 
 import logging
@@ -13,7 +14,7 @@ import logging
 
 from api.user_api import user_api
 # from api.country_api import country_api
-# from api.place_api import place_api
+from api.place_api import place_api
 from api.amenities_api import amenities_api
 # from api.review_api import review_api
 # from api.cities_api import cities_api
@@ -50,7 +51,7 @@ swaggerui_blueprint = get_swaggerui_blueprint(
 app.register_blueprint(swaggerui_blueprint)
 app.register_blueprint(user_api)
 # app.register_blueprint(country_api)
-# app.register_blueprint(place_api)
+app.register_blueprint(place_api)
 app.register_blueprint(amenities_api)
 # app.register_blueprint(review_api)
 # app.register_blueprint(cities_api)

@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from models.place import Place
+from models.amenity import Amenity
 from persistence.datamanager import DataManager
 import json
 place_api = Blueprint("place_api", __name__)
@@ -26,10 +27,6 @@ def add_place():
         num_bathrooms = place_data.get("num_bathrooms")
         price_per_night = place_data.get("price_per_night")
         max_guests = place_data.get("max_guests")
-        # Pas sûr de comment initialiser ces attributs
-        # host_id est l'id de la personne qui créé la Place
-        # city_id viendra de city_api
-        # amenity_ids est l'UUID d'une amenity que l'user veut ajouter
         host_id = place_data.get("host_id")
         amenity_ids = place_data.get("amenity_ids")
         city_id = place_data.get("city_id")
@@ -55,27 +52,39 @@ def add_place():
         if not new_place:
             return jsonify({"Error": "setting up new place"}), 500
         else:
-            if amenity_ids is None:
-                datamanager.save(new_place.to_dict())
-                return jsonify({"Success": "Place added"},
-                               new_place.to_dict()), 201
+            if amenity_ids:
+                am_ex = Amenity.query.filter_by(id=amenity_ids).all()
+                if not am_ex:
+                    return jsonify({"Error": "Amenity does not exist"}), 404
+                else:
+                    datamanager.save_to_database(new_place)
+                    return jsonify({"Success": "Place added"}), 201
             else:
-                with open("/home/hbnb/hbnb_data/Amenity.json", 'r') as f:
-                    amenities = json.load(f)
+                datamanager.save_to_database(new_place)
+                return jsonify({"Success": "Place added"}), 201
 
-            # Check if the amenity_id exists in the place_data
-                    for amenity in amenities:
-                        if amenity.get("uniq_id") == amenity_ids:
-                            datamanager.save(new_place.to_dict())
-                            return jsonify(
-                                {"Success": "Place added"}, new_place.to_dict()), 201
-                    return jsonify({"Error": "Amenity not found"}), 409
     else:
         try:
-            with open("/home/hbnb/hbnb_data/Place.json", 'r', encoding='UTF-8') as f:
-                places = json.load(f)
-                return jsonify(places), 200
-        except FileNotFoundError:
+            places = Place.query.all()
+            place_list = []
+            for place in places:
+                place_list.append({
+                    "id": place.id,
+                    "name": place.name,
+                    "description": place.description,
+                    "address": place.address,
+                    "city_id": place.city_id,
+                    "latitude": place.latitude,
+                    "longitude": place.longitude,
+                    "host_id": place.host_id,
+                    "num_rooms": place.num_rooms,
+                    "num_bathrooms": place.num_bathrooms,
+                    "price_per_night": place.price_per_night,
+                    "max_guests": place.max_guests,
+                    "amenity_ids": place.amenity_ids
+                })
+            return jsonify(place_list), 200
+        except Exception as e:
             return jsonify({"Error": "No place found"}), 404
 
 
