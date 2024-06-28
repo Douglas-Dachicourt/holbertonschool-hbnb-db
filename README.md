@@ -88,6 +88,6 @@ If needed, replace `http://localhost` with the machine's IP address `http://ip`
 
 ## Contributors
 
-- **Jérôme ROMAND** (https://github.com/jeje-digifab)
-- **Maxime MARTIN** (https://github.com/cosmos510)
-- **Nicolas DOYEN** (https://github.com/niranois13)
+- [Douglas **DACHICOURT**](https://github.com/Douglas-Dachicourt)
+- [Maxime **MARTIN**](https://github.com/cosmos510)
+- [Sofiane **ARFANE**](https://github.com/Sofiane74100)
