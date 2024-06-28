@@ -22,4 +22,3 @@ validate-email-address==1
 Werkzeug==3.0.3
 python-dotenv
 Flask-JWT-Extended
-Flask-Migrate
