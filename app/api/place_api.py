@@ -3,6 +3,7 @@ from models.place import Place
 from models.amenity import Amenity
 from persistence.datamanager import DataManager
 import json
+
 place_api = Blueprint("place_api", __name__)
 datamanager = DataManager(flag=2)
 
@@ -10,8 +11,28 @@ datamanager = DataManager(flag=2)
 @place_api.route("/places", methods=["POST", "GET"])
 def add_place():
     """
-    Function used to create a new place, send it to the database datamanager
-    and read a list of existing places.
+    Endpoint to create and list places.
+
+    POST method:
+    Creates a new place with JSON data containing 'name', 'description',
+    'address', 'latitude', 'longitude',
+    'num_rooms', 'num_bathrooms', 'price_per_night', 'max_guests', 'host_id',
+    'amenity_ids', 'city_id'.
+    Validates input data and checks for required fields.
+    Checks if amenities exist before saving.
+    Returns a success message if place is created successfully, or an error
+    message if failed.
+
+    GET method:
+    Retrieves a list of all places.
+    Returns a JSON array of place objects containing 'id', 'name',
+    'description', 'address', 'city_id', 'latitude',
+    'longitude', 'host_id', 'num_rooms', 'num_bathrooms', 'price_per_night',
+    'max_guests', 'amenity_ids'.
+    Returns an error message if no places are found.
+
+    Returns:
+        JSON: Response message with appropriate HTTP status code.
     """
     if request.method == "POST":
         place_data = request.get_json()
@@ -91,10 +112,34 @@ def add_place():
 @place_api.route("/places/<string:id>", methods=["GET", "DELETE", "PUT"])
 def get_place(id):
     """
-    Function used to read, update or delete a specific place's info
-    from the database
+    Endpoint to retrieve, update or delete a specific place identified by 'id'.
+
+    GET method:
+    Retrieves details of the place identified by 'id'.
+    Returns a JSON object with 'id', 'name', 'description', 'address',
+    'city_id', 'latitude', 'longitude',
+    'host_id', 'num_rooms', 'num_bathrooms', 'price_per_night', 'max_guests',
+    'amenity_ids'.
+    Returns an error message if place is not found.
+
+    DELETE method:
+    Deletes the place identified by 'id'.
+    Returns a success message upon successful deletion.
+    Returns an error message if place is not found.
+
+    PUT method:
+    Updates the place identified by 'id' with provided JSON data.
+    Returns a success message upon successful update.
+    Returns an error message if place is not found or update fails.
+
+    Args:
+        id (str): The unique identifier of the place.
+
+    Returns:
+        JSON: Response message with appropriate HTTP status code.
     """
     place = Place.query.filter_by(id=id).first()
+
     if request.method == "GET":
         places = datamanager.get_from_database(Place, id)
         if not place:
@@ -117,7 +162,7 @@ def get_place(id):
 
     if request.method == "DELETE":
         if not place:
-            return jsonify({"Cannot": "find the place"}), 404
+            return jsonify({"Error": "Place not found"}), 404
         else:
             datamanager.delete_from_database(Place, id)
             return jsonify({"Success": "Place deleted"}), 200
@@ -134,8 +179,10 @@ def get_place(id):
         place.longitude = place_data.get("longitude", place.longitude)
         place.host_id = place_data.get("host_id", place.host_id)
         place.num_rooms = place_data.get("num_rooms", place.num_rooms)
-        place.num_bathrooms = place_data.get("num_bathrooms", place.num_bathrooms)
-        place.price_per_night = place_data.get("price_per_night", place.price_per_night)
+        place.num_bathrooms = place_data.get("num_bathrooms",
+                                             place.num_bathrooms)
+        place.price_per_night = place_data.get("price_per_night",
+                                               place.price_per_night)
         place.max_guests = place_data.get("max_guests", place.max_guests)
         place.amenity_ids = place_data.get("amenity_ids", place.amenity_ids)
         datamanager.update_database(Place, id, place_data)

@@ -3,7 +3,8 @@ from persistence.datamanager import DataManager
 from validate_email_address import validate_email
 from uuid import UUID
 
-#from flask_jwt_extended import jwt_required, create_access_token, get_jwt_identity
+# from flask_jwt_extended import {
+# jwt_required, create_access_token, get_jwt_identity}
 import json
 import datetime
 import os
@@ -14,6 +15,24 @@ datamanager = DataManager(flag=1)
 
 @user_api.route("/users", methods=["POST", "GET"])
 def add_or_list_users():
+    """
+    Add a new user or list all existing users.
+
+    POST method:
+    Creates a new user with provided JSON data containing 'email',
+    'first_name', 'last_name', and 'password'.
+    Validates email format and checks for existing users before adding.
+    Returns a success message if user is added successfully, or an error
+    message if failed.
+
+    GET method:
+    Retrieves a list of all users from the database.
+    Returns a JSON array of user objects containing 'id', 'email',
+    'first_name', and 'last_name'.
+
+    Returns:
+        JSON: Response message with appropriate HTTP status code.
+    """
 
     from models.users import User
 
@@ -41,10 +60,12 @@ def add_or_list_users():
             return jsonify({"error": "User already exists"}), 409
 
         # Create a new User object
-        new_user = User(email=email, first_name=first_name, last_name=last_name, password=password)
+        new_user = User(email=email, first_name=first_name,
+                        last_name=last_name, password=password)
 
         try:
-            datamanager.save_to_database(new_user)  # Sauvegarde via DataManager
+            # save the user to the database
+            datamanager.save_to_database(new_user)
             return jsonify({"message": "User added successfully"}), 201
         except Exception as e:
             return jsonify({"error": f"Failed to add user: {str(e)}"}), 500
@@ -61,9 +82,34 @@ def add_or_list_users():
             })
         return jsonify(user_list), 200
 
+
 @user_api.route("/users/<user_id>", methods=["GET", "PUT", "DELETE"])
 def get_update_delete_user(user_id):
+    """
+    Retrieve, update, or delete a specific user by user ID.
 
+    GET method:
+    Retrieves the details of a user identified by 'user_id'.
+    Returns a JSON object with 'id', 'email', 'first_name', and
+    'last_name'.
+    Returns an error message if the user is not found.
+
+    PUT method:
+    Updates the details of an existing user identified by 'user_id' with
+    provided JSON data.
+    Returns a success message if user is updated successfully, or an error
+    message if failed.
+
+    DELETE method:
+    Deletes an existing user identified by 'user_id'.
+    Returns a success message upon successful deletion.
+
+    Args:
+        user_id (str): The unique identifier of the user.
+
+    Returns:
+        JSON: Response message with appropriate HTTP status code.
+    """
     from models.users import User
 
     user = User.query.filter_by(id=user_id).first()
@@ -87,12 +133,13 @@ def get_update_delete_user(user_id):
         user.last_name = user_data.get("last_name", user.last_name)
 
         try:
-            datamanager.update_database(User, user_id, user_data)  # Mise à jour via DataManager
+            # Update the user through datamanager
+            datamanager.update_database(User, user_id, user_data)
             return jsonify({"message": "User updated successfully"}), 200
         except Exception as e:
             return jsonify({"error": f"Failed to update user: {str(e)}"}), 500
 
     elif request.method == "DELETE":
-
-        datamanager.delete_from_database(User, user_id)  # Suppression via DataManager
+        # Deletion via DataManager
+        datamanager.delete_from_database(User, user_id)
         return jsonify({"message": "User deleted successfully"})

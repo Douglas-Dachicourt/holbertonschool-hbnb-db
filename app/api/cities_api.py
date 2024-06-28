@@ -4,6 +4,7 @@ from persistence.datamanager import DataManager
 import json
 import datetime
 import os
+
 datamanager = DataManager(flag=5)
 cities_api = Blueprint("cities_api", __name__)
 
@@ -11,7 +12,22 @@ cities_api = Blueprint("cities_api", __name__)
 @cities_api.route("/cities", methods=["POST", 'GET'])
 def cities():
     """
-    Function used to create a new city, send it to the database datamanager
+    Endpoint to manage cities in the database.
+
+    POST method:
+    Creates a new city based on JSON data provided in the request body.
+    Checks if the city already exists.
+    Saves the new city to the database using DataManager.
+
+    Returns:
+        JSON: Success message if city is added successfully, or error message
+        if failed.
+
+    GET method:
+    Retrieves all cities from the database.
+
+    Returns:
+        JSON: List of dictionaries containing details of all cities.
     """
     if request.method == "POST":
         city_data = request.get_json()
@@ -20,10 +36,12 @@ def cities():
 
         name = city_data.get("name")
         country = city_data.get("country_id")
+
         if not name:
             return jsonify({"Error": "Missing required field."}), 400
 
         new_city = City(name, country)
+
         if not new_city:
             return jsonify({"Error": "setting up new city"}), 500
         else:
@@ -54,23 +72,48 @@ def cities():
 @cities_api.route("/cities/<city_id>", methods=["GET", "DELETE", "PUT"])
 def get_city(city_id):
     """
-    Function used to read, update or delete a specific city's info
-    from the database
+    Endpoint to retrieve, update, or delete a specific city by its ID.
+
+    GET method:
+    Retrieves details of the city by its ID from the database.
+
+    Returns:
+        JSON: Dictionary containing details of the requested city, or error
+        message if city is not found.
+
+    PUT method:
+    Updates details of the city based on JSON data provided in the request
+    body.
+
+    Returns:
+        JSON: Success message if city is updated successfully, or error message
+        if failed.
+
+    DELETE method:
+    Deletes the city from the database based on its ID.
+
+    Returns:
+        JSON: Success message if city is deleted successfully, or error message
+        if city is not found.
     """
     if request.method == "GET":
         city = City.query.filter_by(id=city_id).first()
+
         if city:
             return jsonify({"id": str(city.id),
                             "name": city.name,
                             "country_id": city.country_id}), 200
         return jsonify({"Error": "City not found"}), 404
+
     if request.method == "PUT":
         city_data = request.get_json()
+
         if not city_data:
             return jsonify({"Error": "Problem during city update."}), 400
 
         name = city_data.get("name")
         country = city_data.get("country_id")
+
         if not name:
             return jsonify({"Error": "Missing required field."}), 400
 
@@ -83,7 +126,7 @@ def get_city(city_id):
 
         datamanager.update_database(City, city_id, city_data)
         return jsonify({"Success": "City updated"}), 200
-    
+
     if request.method == "DELETE":
         city = City.query.filter_by(id=city_id).first()
         if not city:
