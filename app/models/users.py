@@ -5,13 +5,36 @@ import uuid
 
 
 class User(BaseModel, db.Model):
-    """ User class """
+    """
+    User class representing user information.
+
+    Attributes:
+        id (str): Unique identifier for the user, automatically generated
+        using UUID.
+        email (str): Email address of the user.
+        first_name (str): First name of the user.
+        last_name (str): Last name of the user.
+        password (str): Password of the user.
+        is_admin (bool): Flag indicating if the user has administrative
+        privileges.
+        created_at (datetime): Timestamp indicating when the user was created.
+        updated_at (datetime): Timestamp indicating when the user was last
+        updated.
+
+    Table Name:
+        users
+
+    Methods:
+        __init__(self, email, first_name, last_name, password):
+            Initializes a new instance of the User class.
+    """
 
     __tablename__ = "users"
 
-    id = Column(String(256), nullable=False, default=lambda: str(uuid.uuid4()), primary_key=True)
+    id = Column(String(256), nullable=False, default=lambda:
+                str(uuid.uuid4()), primary_key=True)
     email = Column(String(256), nullable=False)
-    first_name = Column(String(50), nullable = False)
+    first_name = Column(String(50), nullable=False)
     last_name = Column(String(50), nullable=False)
     password = Column(String(50), nullable=False)
     is_admin = Column(Boolean, default=False)
@@ -19,21 +42,17 @@ class User(BaseModel, db.Model):
     updated_at = Column(DateTime, onupdate=func.current_timestamp())
 
     def __init__(self, email, first_name, last_name, password):
+        """
+        Initializes a new instance of the User class.
+
+        Args:
+            email (str): Email address of the user.
+            first_name (str): First name of the user.
+            last_name (str): Last name of the user.
+            password (str): Password of the user.
+        """
         super().__init__()
         self.email = email
         self.first_name = first_name
         self.last_name = last_name
         self.password = password
-
-
-"""
-curl -X POST http://localhost:5000/users \
-     -H "Content-Type: application/json" \
-     -d '{
-           "email": "seth.s@example.com",
-           "first_name": "Seth",
-           "last_name": "S",
-           "password": "seddssssss"
-         }'
-
-"""         
