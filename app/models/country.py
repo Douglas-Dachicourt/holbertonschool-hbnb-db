@@ -1,5 +1,15 @@
-class Country():
+from sqlalchemy import String, Column, Integer
+from db import db
+
+class Country(db.Model):
     """Defines the class Country"""
+
+    __tablename__ = "countries"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(30), nullable=False)
+    code = Column(String(10), nullable=False)
+
 
     def __init__(self, name, code):
         """Initializes the class Country wth the following parameters:
@@ -9,7 +19,8 @@ class Country():
         self.code = code
 
     def to_dict(self):
-        result = {}
-        for key, value in self.__dict__.items():
-            result[key] = value
-        return result
+        return {
+            "id": self.id,
+            "name": self.name,
+            "code": self.code
+        }
