@@ -11,6 +11,7 @@ from models.amenity import Amenity
 from models.place import Place
 from models.country import Country
 from models.review import Review
+from models.city import City
 
 # Logging module import to capture app logs
 import logging
