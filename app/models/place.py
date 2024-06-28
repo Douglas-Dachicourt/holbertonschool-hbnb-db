@@ -1,14 +1,44 @@
 from models.base_model import BaseModel
-from sqlalchemy import String, Column, Float, Integer, DateTime, func
+from sqlalchemy import String, Column, Float, Integer
 from db import db
 import uuid
 
+
 class Place(BaseModel, db.Model):
-    """Defines class Place that inherits from BaseModel"""
+    """
+    Place class representing a location available for booking.
+
+    Attributes:
+        id (str): Unique identifier for the place, automatically generated
+        using UUID.
+        name (str): Name of the place.
+        description (str): Description of the place.
+        address (str): Address of the place.
+        city_id (str): ID of the city where the place is located.
+        latitude (float): Latitude coordinates of the place.
+        longitude (float): Longitude coordinates of the place.
+        host_id (str): ID of the host or owner of the place.
+        num_rooms (int): Number of rooms in the place.
+        num_bathrooms (int): Number of bathrooms in the place.
+        price_per_night (float): Price per night for booking the place.
+        max_guests (int): Maximum number of guests the place can accommodate.
+        amenity_ids (str, optional): IDs of amenities available at the place.
+
+    Table Name:
+        places
+
+    Methods:
+        __init__(self, name, description, address, city_id, latitude,
+        longitude, host_id, num_rooms, num_bathrooms, price_per_night,
+        max_guests, amenity_ids=None):
+
+        => Initializes a new instance of the Place class.
+    """
 
     __tablename__ = "places"
 
-    id = Column(String(256), nullable=False, default=lambda: str(uuid.uuid4()), primary_key=True)
+    id = Column(String(256), nullable=False, default=lambda: str(uuid.uuid4()),
+                primary_key=True)
     name = Column(String(256), nullable=False)
     description = Column(String(1024), nullable=False)
     address = Column(String(256), nullable=False)

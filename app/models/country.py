@@ -1,15 +1,33 @@
 from sqlalchemy import String, Column, Integer
 from db import db
 
+
 class Country(db.Model):
-    """Defines the class Country"""
+    """
+    Defines the Country class representing a country with its name
+    and code.
+
+    Attributes:
+        id (int): Unique identifier for the country, automatically
+        incremented.
+        name (str): Name of the country.
+        code (str): International code of the country.
+
+    Table Name:
+        countries
+
+    Methods:
+        __init__(self, name, code):
+            Initializes a new instance of the Country class.
+        to_dict(self):
+            Converts the Country object to a dictionary representation.
+    """
 
     __tablename__ = "countries"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(30), nullable=False)
     code = Column(String(10), nullable=False)
-
 
     def __init__(self, name, code):
         """Initializes the class Country wth the following parameters:
