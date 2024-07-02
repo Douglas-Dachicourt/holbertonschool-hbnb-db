@@ -27,7 +27,7 @@ class DataManager(IPersistenceManager):
             either 'file' or 'database'.
     """
         self.set_file_path(flag)
-        self.persistence_mode = os.getenv("PERSISTENCE_MODE", "file")
+
 
     def set_file_path(self, flag):
         """Sets in which json file data will be managed based on a flag"""
@@ -86,7 +86,14 @@ class DataManager(IPersistenceManager):
         Raises:
             ValueError: If the entity type is not supported.
         """
-
+        if isinstance(entity, dict):
+            return self.get_from_file(entity, id)
+        elif hasattr(entity, '__tablename__'):
+            return self.get_from_database(entity, id)
+        else:
+            raise ValueError("Unsupported entity type")
+        
+        
     def delete(self, entity, id):
         """
         Deletes the entity from the appropriate storage (file or database)
