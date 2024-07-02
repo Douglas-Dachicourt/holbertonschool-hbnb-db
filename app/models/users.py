@@ -33,13 +33,15 @@ class User(BaseModel, db.Model):
 
     id = Column(String(256), nullable=False, default=lambda:
                 str(uuid.uuid4()), primary_key=True)
-    email = Column(String(256), nullable=False)
+    email = Column(String(256), nullable=False, unique=True)
     first_name = Column(String(50), nullable=False)
     last_name = Column(String(50), nullable=False)
     password = Column(String(50), nullable=False)
     is_admin = Column(Boolean, default=False)
     created_at = Column(DateTime, default=func.current_timestamp())
     updated_at = Column(DateTime, onupdate=func.current_timestamp())
+    uniq_id = Column(String(256), nullable=False,
+                     unique=True, default=lambda: str(uuid.uuid4()))
 
     def __init__(self, email, first_name, last_name, password):
         """
