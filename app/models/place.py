@@ -51,6 +51,8 @@ class Place(BaseModel, db.Model):
     price_per_night = Column(Float, nullable=False)
     max_guests = Column(Integer, nullable=False)
     amenity_ids = Column(String(256), nullable=True)
+    uniq_id = Column(String(256), unique=True, nullable=False,
+                     default=lambda: str(uuid.uuid4()))
 
     def __init__(self, name, description, address, city_id, latitude,
                  longitude, host_id, num_rooms, num_bathrooms,
