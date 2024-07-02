@@ -43,6 +43,8 @@ class Review(BaseModel, db.Model):
     place_id = Column(String(50), ForeignKey("places.id"), nullable=False)
     rating = Column(Integer, nullable=False)
     comment = Column(String(500))
+    uniq_id = Column(String(256), unique=True, nullable=False,
+                     default=lambda: str(uuid.uuid4()))
 
     user = relationship("User", backref="reviews")
     place = relationship("Place", backref="reviews")
