@@ -3,6 +3,7 @@ from flask_swagger_ui import get_swaggerui_blueprint
 from flask import Flask
 from dotenv import load_dotenv
 from db import db
+from config import get_config
 # from flask_jwt_extended import JWTManager
 
 # Models imports
@@ -24,20 +25,21 @@ from api.amenities_api import amenities_api
 from api.review_api import review_api
 from api.cities_api import cities_api
 
-
-logging.basicConfig(level=logging.DEBUG)
-
+# Load environment variables from .env file
 load_dotenv()
 
-
+# Initialize Flask app
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///development.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config.from_object(get_config())
+
 # app.config['JWT_SECRET_KEY'] = 'your_secret_key'
 
 db.init_app(app)
 # jwt =JWTManager(app)
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
 
 SWAGGER_URL = '/api/docs'
 API_URL = '/static/swagger.json'

@@ -47,88 +47,91 @@ class DataManager(IPersistenceManager):
 
     def save(self, entity):
         """
-        Saves the entity based on the current persistence mode.
+        Saves the entity to the appropriate storage (file or database).
 
         Args:
-            entity (dict or SQLAlchemy model): Entity to be saved.
-                If using 'file' mode, expects a dictionary.
-                If using 'database' mode, expects a SQLAlchemy model.
+            entity (dict or SQLAlchemy model):
+            The entity to save. If it's a dictionary, it will be saved to
+            a file.
+            If it has a '__tablename__' attribute (indicating it's an
+            SQLAlchemy model),
+            it will be saved to the database.
 
         Raises:
-            ValueError: If persistence mode is not supported.
+            ValueError: If the entity type is not supported.
         """
-        if self.persistence_mode == "file":
+        if isinstance(entity, dict):
             self.save_to_file(entity)
-        elif self.persistence_mode == "database":
+        elif hasattr(entity, '__tablename__'):
             self.save_to_database(entity)
         else:
-            raise ValueError(f"Unsupported persistence" +
-                             "mode: {self.persistence_mode}")
+            raise ValueError("Unsupported entity type")
 
     def get(self, entity, id):
         """
-        Retrieves the entity with the specified id based on the current
-        persistence mode.
+        Retrieves the entity from the appropriate storage (file or database)
+        based on its id.
 
         Args:
-            entity (type): Type of entity to retrieve (used in database mode).
-            id (str): Unique identifier of the entity.
+            entity (type): The type of entity to retrieve. If it's a
+            dictionary, it will be retrieved from a file.
+            If it has a '__tablename__' attribute
+                    (indicating it's an SQLAlchemy model), it will be
+                    retrieved from the database.
+            id (str): The unique identifier of the entity.
 
         Returns:
-            dict or SQLAlchemy model: Retrieved entity.
+            dict or SQLAlchemy model: The retrieved entity data.
 
         Raises:
-            ValueError: If persistence mode is not supported.
+            ValueError: If the entity type is not supported.
         """
-        if self.persistence_mode == "file":
-            return self.get_from_file(entity, id)
-        elif self.persistence_mode == "database":
-            return self.get_from_database(entity, id)
-        else:
-            raise ValueError(f"Unsupported persistence" +
-                             "mode: {self.persistence_mode}")
 
     def delete(self, entity, id):
         """
-        Deletes the entity with the specified id based on the current
-        persistence mode.
+        Deletes the entity from the appropriate storage (file or database)
+        based on its id.
 
         Args:
-            entity (type): Type of entity to delete (used in database mode).
-            id (str): Unique identifier of the entity.
+            entity (type): The type of entity to delete. If it's a dictionary,
+            it will be deleted from a file.
+            If it has a '__tablename__' attribute (indicating
+                        it's an SQLAlchemy model), it will be deleted from
+                        the database.
+            id (str): The unique identifier of the entity to delete.
 
         Raises:
-            ValueError: If persistence mode is not supported.
+            ValueError: If the entity type is not supported.
         """
-        if self.persistence_mode == "file":
+        if isinstance(entity, dict):
             self.delete_from_file(entity, id)
-        elif self.persistence_mode == "database":
+        elif hasattr(entity, '__tablename__'):
             self.delete_from_database(entity, id)
         else:
-            raise ValueError(f"Unsupported persistence" +
-                             "mode: {self.persistence_mode}")
+            raise ValueError("Unsupported entity type")
 
-    def update(self, entity, id):
+    def update(self, entity, id, data):
         """
-        Updates the entity with the specified id based on the current
-        persistence mode.
+        Updates the entity in the appropriate storage (file or database) based
+        on its id.
 
         Args:
-            entity (dict or SQLAlchemy model): Updated entity.
-                If using 'file' mode, expects a dictionary.
-                If using 'database' mode, expects a SQLAlchemy model.
-            id (str): Unique identifier of the entity.
+            entity (type): The type of entity to update. If it's a dictionary,
+            it will be updated in a file.
+            If it has a '__tablename__' attribute (indicating it's an
+            SQLAlchemy model), it will be updated in the database.
+            id (str): The unique identifier of the entity to update.
+            data (dict): The data to update the entity with.
 
         Raises:
-            ValueError: If persistence mode is not supported.
+            ValueError: If the entity type is not supported.
         """
-        if self.persistence_mode == "file":
+        if isinstance(entity, dict):
             self.update_file(entity, id)
-        elif self.persistence_mode == "database":
-            self.update_database(entity, id)
+        elif hasattr(entity, '__tablename__'):
+            self.update_database(entity, id, data)
         else:
-            raise ValueError(f"Unsupported persistence" +
-                             "mode: {self.persistence_mode}")
+            raise ValueError("Unsupported entity type")
 
     def save_to_file(self, entity):
         """
