@@ -29,6 +29,8 @@ class Amenity(BaseModel, db.Model):
     id = Column(String(256), nullable=False, default=lambda: str(uuid.uuid4()),
                 primary_key=True)
     name = Column(String(128), nullable=False)
+    uniq_id = Column(String(256), unique=True, nullable=False,
+                     default=lambda: str(uuid.uuid4()))
 
     def __init__(self, name):
         """
