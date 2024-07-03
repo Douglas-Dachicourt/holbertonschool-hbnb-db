@@ -26,8 +26,8 @@ class Country(db.Model):
     __tablename__ = "countries"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(30), nullable=False)
-    code = Column(String(10), nullable=False)
+    name = Column(String(100), nullable=False)
+    code = Column(String(30), nullable=False)
 
     def __init__(self, name, code):
         """Initializes the class Country wth the following parameters:
