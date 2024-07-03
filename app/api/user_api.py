@@ -142,4 +142,4 @@ def get_update_delete_user(user_id):
     elif request.method == "DELETE":
         # Deletion via DataManager
         datamanager.delete_from_database(User, user_id)
-        return jsonify({"message": "User deleted successfully"})
+        return jsonify({"message": "User deleted successfully"}), 204
