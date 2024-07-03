@@ -13,14 +13,9 @@ class Config(object):
         SQLALCHEMY_TRACK_MODIFICATIONS (bool): If set to False,
         it disables the modification tracking system in SQLAlchemy
                                                to save memory.
-        SQLALCHEMY_DATABASE_URI (str): The database URI that should be used
-        for the connection. It reads from the environment
-                                       variable 'DATABASE_URL' or defaults to
-                                       'sqlite:///development.db'.
+
     """
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL',
-                                             'sqlite:///development.db')
 
 
 class DevelopmentConfig(Config):
@@ -30,8 +25,15 @@ class DevelopmentConfig(Config):
     Attributes:
         DEBUG (bool): If set to True, enables debug mode for the Flask
         application.
+        SQLALCHEMY_DATABASE_URI (str): The database URI that should be used
+        for the connection. It reads from the environment
+                                       variable 'DATABASE_URL' or defaults to
+                                       'sqlite:///development.db'.
     """
     DEBUG = True
+
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL',
+                                             'sqlite:///development.db')
 
 
 class ProductionConfig(Config):
@@ -41,9 +43,14 @@ class ProductionConfig(Config):
     Attributes:
         DEBUG (bool): If set to False, disables debug mode for the Flask
         application.
+        SQLALCHEMY_DATABASE_URI (str): The database URI that should be used
+        for the connection. It reads from the environment
+                                       variable 'DATABASE_URL' (production)
     """
 
     DEBUG = False
+
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
 
 
 def get_config():

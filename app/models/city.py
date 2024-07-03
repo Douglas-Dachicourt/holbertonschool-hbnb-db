@@ -1,6 +1,6 @@
 from models.base_model import BaseModel
 from db import db
-from sqlalchemy import String, Column, ForeignKey
+from sqlalchemy import String, Integer, Column, ForeignKey
 import uuid
 
 
@@ -28,7 +28,7 @@ class City(BaseModel, db.Model):
     id = Column(String(256), nullable=False, default=lambda: str(uuid.uuid4()),
                 primary_key=True)
     name = Column(String(128), nullable=False)
-    country_id = Column(String(60), ForeignKey('countries.id'), nullable=False)
+    country_id = Column(Integer, ForeignKey('countries.id'), nullable=False)
     uniq_id = Column(String(60), unique=True, nullable=False,
                      default=lambda: str(uuid.uuid4()))
 
