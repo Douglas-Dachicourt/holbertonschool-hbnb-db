@@ -2,10 +2,8 @@ from models.base_model import BaseModel
 from sqlalchemy import String, Column, Boolean, DateTime, func
 from db import db
 import uuid
-from flask_bcrypt import Bcrypt
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import generate_password_hash
 
-bcrypt = Bcrypt()
 
 class User(BaseModel, db.Model):
     """
@@ -62,17 +60,3 @@ class User(BaseModel, db.Model):
         self.last_name = last_name
         self.is_admin = is_admin
         self.password = generate_password_hash(password)
-      
-
-    def check_password(self, password):
-        """
-        Checks if the provided password is correct.
-
-        Args:
-            password (str): Password to check.
-
-        Returns:
-            bool: True if the password is correct, False otherwise.
-        """
-        return bcrypt.check_password_hash(self.password, password)
-

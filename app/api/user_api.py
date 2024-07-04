@@ -5,11 +5,6 @@ from uuid import UUID
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from werkzeug.security import generate_password_hash, check_password_hash
 
-# from flask_jwt_extended import {
-# jwt_required, create_access_token, get_jwt_identity}
-import json
-import datetime
-import os
 
 user_api = Blueprint("user_api", __name__)
 datamanager = DataManager(flag=1)
@@ -134,6 +129,7 @@ def get_update_delete_user(user_id):
         user.email = user_data.get("email", user.email)
         user.first_name = user_data.get("first_name", user.first_name)
         user.last_name = user_data.get("last_name", user.last_name)
+        user.password = user_data.get("password", user.password)
 
         try:
             # Update the user through datamanager

@@ -1,10 +1,9 @@
 import os
 from flask_swagger_ui import get_swaggerui_blueprint
-from flask import Flask
+from flask import Flask, jsonify, request
 from dotenv import load_dotenv
 from db import db
 from config import get_config
-# from flask_jwt_extended import JWTManager
 
 # Models imports
 from models.users import User
@@ -27,8 +26,6 @@ from api.cities_api import cities_api
 from api.auth import auth
 #---------------------------------------------------------------------
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
-from flask import Flask, jsonify, request
-from flask_bcrypt import Bcrypt
 
 # Load environment variables from .env file
 load_dotenv()
@@ -40,7 +37,6 @@ app.config.from_object(get_config())
 
 #-------------------------------------------------------------
 app.config['JWT_SECRET_KEY'] = 'super-secret'  # Change this to a more secure key
-bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 
 db.init_app(app)
