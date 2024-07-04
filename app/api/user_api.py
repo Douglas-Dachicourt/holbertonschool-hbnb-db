@@ -2,6 +2,8 @@ from flask import Blueprint, jsonify, request
 from persistence.datamanager import DataManager
 from validate_email_address import validate_email
 from uuid import UUID
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from werkzeug.security import generate_password_hash, check_password_hash
 
 # from flask_jwt_extended import {
 # jwt_required, create_access_token, get_jwt_identity}
@@ -46,6 +48,7 @@ def add_or_list_users():
         first_name = user_data.get("first_name")
         last_name = user_data.get("last_name")
         password = user_data.get("password")
+        is_admin = user_data.get("is_admin")
 
         if not all([email, first_name, last_name]):
             return jsonify({"error": "Missing required field"}), 400
@@ -61,7 +64,7 @@ def add_or_list_users():
 
         # Create a new User object
         new_user = User(email=email, first_name=first_name,
-                        last_name=last_name, password=password)
+                        last_name=last_name, password=password, is_admin=is_admin)
 
         try:
             # save the user to the database
@@ -125,7 +128,7 @@ def get_update_delete_user(user_id):
             "last_name": user.last_name
         }), 200
 
-    elif request.method == "PUT":
+    if request.method == "PUT":
         user_data = request.get_json()
 
         user.email = user_data.get("email", user.email)
@@ -139,7 +142,7 @@ def get_update_delete_user(user_id):
         except Exception as e:
             return jsonify({"error": f"Failed to update user: {str(e)}"}), 500
 
-    elif request.method == "DELETE":
+    if request.method == "DELETE":
         # Deletion via DataManager
         datamanager.delete_from_database(User, user_id)
-        return jsonify({"message": "User deleted successfully"}), 204
+        return jsonify({"message": "User deleted successfully"})

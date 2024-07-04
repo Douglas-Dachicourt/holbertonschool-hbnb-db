@@ -24,6 +24,11 @@ from api.place_api import place_api
 from api.amenities_api import amenities_api
 from api.review_api import review_api
 from api.cities_api import cities_api
+from api.auth import auth
+#---------------------------------------------------------------------
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from flask import Flask, jsonify, request
+from flask_bcrypt import Bcrypt
 
 # Load environment variables from .env file
 load_dotenv()
@@ -33,16 +38,20 @@ app = Flask(__name__)
 
 app.config.from_object(get_config())
 
-# app.config['JWT_SECRET_KEY'] = 'your_secret_key'
+#-------------------------------------------------------------
+app.config['JWT_SECRET_KEY'] = 'super-secret'  # Change this to a more secure key
+bcrypt = Bcrypt(app)
+jwt = JWTManager(app)
 
 db.init_app(app)
-# jwt =JWTManager(app)
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 
 SWAGGER_URL = '/api/docs'
 API_URL = '/static/swagger.json'
+
+
 
 swaggerui_blueprint = get_swaggerui_blueprint(
     # Swagger UI static files will be mapped to '{SWAGGER_URL}/dist/'
@@ -61,7 +70,7 @@ app.register_blueprint(place_api)
 app.register_blueprint(amenities_api)
 app.register_blueprint(review_api)
 app.register_blueprint(cities_api)
-
+app.register_blueprint(auth)
 
 if __name__ == "__main__":
     with app.app_context():

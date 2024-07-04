@@ -2,7 +2,10 @@ from models.base_model import BaseModel
 from sqlalchemy import String, Column, Boolean, DateTime, func
 from db import db
 import uuid
+from flask_bcrypt import Bcrypt
+from werkzeug.security import generate_password_hash, check_password_hash
 
+bcrypt = Bcrypt()
 
 class User(BaseModel, db.Model):
     """
@@ -37,13 +40,13 @@ class User(BaseModel, db.Model):
     first_name = Column(String(50), nullable=False)
     last_name = Column(String(50), nullable=False)
     password = Column(String(50), nullable=False)
-    is_admin = Column(Boolean, default=False)
+    is_admin = Column(Boolean, default=False, nullable=False)
     created_at = Column(DateTime, default=func.current_timestamp())
     updated_at = Column(DateTime, onupdate=func.current_timestamp())
     uniq_id = Column(String(256), nullable=False,
                      unique=True, default=lambda: str(uuid.uuid4()))
 
-    def __init__(self, email, first_name, last_name, password):
+    def __init__(self, email, first_name, last_name, password, is_admin):
         """
         Initializes a new instance of the User class.
 
@@ -57,4 +60,19 @@ class User(BaseModel, db.Model):
         self.email = email
         self.first_name = first_name
         self.last_name = last_name
-        self.password = password
+        self.is_admin = is_admin
+        self.password = generate_password_hash(password)
+      
+
+    def check_password(self, password):
+        """
+        Checks if the provided password is correct.
+
+        Args:
+            password (str): Password to check.
+
+        Returns:
+            bool: True if the password is correct, False otherwise.
+        """
+        return bcrypt.check_password_hash(self.password, password)
+
