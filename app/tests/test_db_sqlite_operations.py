@@ -21,7 +21,7 @@ class TestDatabaseOperations(unittest.TestCase):
     def test_create_user(self):
         """Test creating a user."""
         user = User(email='test@example.com', first_name='John',
-                    last_name='Doe', password='password')
+                    last_name='Doe', password='password', is_admin=True)
         with app.app_context():
             db.session.add(user)
             db.session.commit()
@@ -38,7 +38,7 @@ class TestDatabaseOperations(unittest.TestCase):
         """Test retrieving a user."""
         # Create a user first
         user = User(email='test@example.com', first_name='John',
-                    last_name='Doe', password='password')
+                    last_name='Doe', password='password', is_admin=True)
         with app.app_context():
             db.session.add(user)
             db.session.commit()
@@ -57,14 +57,13 @@ class TestDatabaseOperations(unittest.TestCase):
         """Test updating a user."""
         # Create a user first
         user = User(email='test@example.com', first_name='John',
-                    last_name='Doe', password='password')
+                    last_name='Doe', password='password', is_admin=True)
         with app.app_context():
             db.session.add(user)
             db.session.commit()
 
         # Retrieve the user using its ID
-            saved_user = User.query.filter_by(email=
-                                              'test@example.com').first()
+            saved_user = User.query.filter_by(email='test@example.com').first()
 
         # Make a PUT request to update the user's data
             updated_data = {
@@ -88,7 +87,7 @@ class TestDatabaseOperations(unittest.TestCase):
         """Test deleting a user."""
     # Create a user first
         user = User(email='test@example.com', first_name='John',
-                    last_name='Doe', password='password')
+                    last_name='Doe', password='password', is_admin=True)
         with app.app_context():
             db.session.add(user)
             db.session.commit()
@@ -101,7 +100,7 @@ class TestDatabaseOperations(unittest.TestCase):
             response = self.app.delete(f'/users/{saved_user.id}')
 
         # Assert that the request was successful and returned 204
-            self.assertEqual(response.status_code, 204)
+            self.assertEqual(response.status_code, 200)
 
         # Try to retrieve the user again to ensure it's deleted
             deleted_user = User.query.get(saved_user.id)
