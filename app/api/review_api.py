@@ -5,6 +5,7 @@ from models.place import Place
 from persistence.datamanager import DataManager
 from db import db
 import json
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt, verify_jwt_in_request
 
 review_api = Blueprint("review_api", __name__)
 datamanager = DataManager(flag=4)
@@ -34,58 +35,60 @@ def handle_place_review(id):
         JSON: Response message with appropriate HTTP status code.
     """
     if request.method == "POST":
-        place_id = id
-        review_data = request.get_json()
+        current_user = get_jwt_identity()
+        if current_user:
+            place_id = id
+            review_data = request.get_json()
 
-        if not review_data:
-            return jsonify({"Error": "Problem during review creation"}), 400
+            if not review_data:
+                return jsonify({"Error": "Problem during review creation"}), 400
 
-        user_id = review_data.get("user_id")
-        rating = review_data.get("rating")
-        comment = review_data.get("comment")
+            user_id = review_data.get("user_id")
+            rating = review_data.get("rating")
+            comment = review_data.get("comment")
 
-        if not isinstance(rating, int):
-            return jsonify({"Error": "rating must be an integer."}), 400
+            if not isinstance(rating, int):
+                return jsonify({"Error": "rating must be an integer."}), 400
 
-        if not 1 <= rating <= 5:
-            return jsonify({"Error": "rating must be between 1 and 5."}), 400
+            if not 1 <= rating <= 5:
+                return jsonify({"Error": "rating must be between 1 and 5."}), 400
 
-        if not isinstance(comment, str):
-            return jsonify({"Error": "comment must be a string."}), 400
+            if not isinstance(comment, str):
+                return jsonify({"Error": "comment must be a string."}), 400
 
-        # Validate user and place existence
-        user = User.query.get(user_id)
-        if not user:
-            return jsonify({"error": "User not found"}), 404
+            # Validate user and place existence
+            user = User.query.get(user_id)
+            if not user:
+                return jsonify({"error": "User not found"}), 404
 
-        place = Place.query.get(place_id)
-        if not place:
-            return jsonify({"error": "No place found"}), 404
+            place = Place.query.get(place_id)
+            if not place:
+                return jsonify({"error": "No place found"}), 404
 
-        # Check if the user is trying to rate their own place
-        if place.host_id == user_id:
-            return jsonify({"error": "Can't rate your own place"}), 404
+            # Check if the user is trying to rate their own place
+            if place.host_id == user_id:
+                return jsonify({"error": "Can't rate your own place"}), 404
 
-        # Check if the user has already reviewed this place
-        existing_review = Review.query.filter_by(user_id=user_id,
-                                                 place_id=place_id).first()
-        if existing_review:
-            return jsonify({"error": "You can't review the" +
-                            "same place twice"}), 404
+            # Check if the user has already reviewed this place
+            existing_review = Review.query.filter_by(user_id=user_id,
+                                                    place_id=place_id).first()
+            if existing_review:
+                return jsonify({"error": "You can't review the" +
+                                "same place twice"}), 404
 
-        new_review = Review(user_id=user_id, place_id=place_id,
-                            rating=rating, comment=comment)
+            new_review = Review(user_id=user_id, place_id=place_id,
+                                rating=rating, comment=comment)
 
-        try:
-            db.session.add(new_review)
-            db.session.commit()
-            return jsonify({"message": "Review added successfully",
-                            "review": new_review.to_dict()}), 201
-        except Exception as e:
-            db.session.rollback()
-            return jsonify({"error": str(e)}), 500
-        finally:
-            db.session.close()
+            try:
+                db.session.add(new_review)
+                db.session.commit()
+                return jsonify({"message": "Review added successfully",
+                                "review": new_review.to_dict()}), 201
+            except Exception as e:
+                db.session.rollback()
+                return jsonify({"error": str(e)}), 500
+            finally:
+                db.session.close()
 
     elif request.method == "GET":
         reviews = Review.query.filter_by(place_id=id).all()
