@@ -3,7 +3,7 @@ from models.place import Place
 from models.amenity import Amenity
 from persistence.datamanager import DataManager
 import json
-
+from flask_jwt_extended import get_jwt, verify_jwt_in_request
 place_api = Blueprint("place_api", __name__)
 datamanager = DataManager(flag=2)
 
@@ -35,6 +35,14 @@ def add_place():
         JSON: Response message with appropriate HTTP status code.
     """
     if request.method == "POST":
+        try:
+            verify_jwt_in_request()
+        except Exception as e:
+            return jsonify({"msg": "Missing Authorization Header"}), 401
+
+        claims = get_jwt()
+        if claims.get('is_admin') is not True:
+            return jsonify({"msg": "Administration rights required"}), 403
         place_data = request.get_json()
         if not place_data:
             return jsonify({"Error": "Problem during place creation"})
@@ -161,6 +169,14 @@ def get_place(id):
         }), 200
 
     if request.method == "DELETE":
+        try:
+            verify_jwt_in_request()
+        except Exception as e:
+            return jsonify({"msg": "Missing Authorization Header"}), 401
+
+        claims = get_jwt()
+        if claims.get('is_admin') is not True:
+            return jsonify({"msg": "Administration rights required"}), 403
         if not place:
             return jsonify({"Error": "Place not found"}), 404
         else:
@@ -168,6 +184,14 @@ def get_place(id):
             return jsonify({"Success": "Place deleted"}), 200
 
     if request.method == "PUT":
+        try:
+            verify_jwt_in_request()
+        except Exception as e:
+            return jsonify({"msg": "Missing Authorization Header"}), 401
+
+        claims = get_jwt()
+        if claims.get('is_admin') is not True:
+            return jsonify({"msg": "Administration rights required"}), 403
         if not place:
             return jsonify({"Error": "Place not found"}), 404
         place_data = request.get_json()

@@ -2,8 +2,9 @@ from flask import Blueprint, jsonify, request
 from persistence.datamanager import DataManager
 from validate_email_address import validate_email
 from uuid import UUID
-from flask_jwt_extended import jwt_required, get_jwt_identity
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt, verify_jwt_in_request
+
 
 
 user_api = Blueprint("user_api", __name__)
@@ -34,6 +35,14 @@ def add_or_list_users():
     from models.users import User
 
     if request.method == "POST":
+        try:
+            verify_jwt_in_request()
+        except Exception as e:
+            return jsonify({"msg": "Missing Authorization Header"}), 401
+
+        claims = get_jwt()
+        if claims.get('is_admin') is not True:
+            return jsonify({"msg": "Administration rights required"}), 403
         user_data = request.get_json()
 
         if not user_data:
@@ -124,6 +133,14 @@ def get_update_delete_user(user_id):
         }), 200
 
     if request.method == "PUT":
+        try:
+            verify_jwt_in_request()
+        except Exception as e:
+            return jsonify({"msg": "Missing Authorization Header"}), 401
+
+        claims = get_jwt()
+        if claims.get('is_admin') is not True:
+            return jsonify({"msg": "Administration rights required"}), 403
         user_data = request.get_json()
 
         user.email = user_data.get("email", user.email)
@@ -140,5 +157,13 @@ def get_update_delete_user(user_id):
 
     if request.method == "DELETE":
         # Deletion via DataManager
+        try:
+            verify_jwt_in_request()
+        except Exception as e:
+            return jsonify({"msg": "Missing Authorization Header"}), 401
+
+        claims = get_jwt()
+        if claims.get('is_admin') is not True:
+            return jsonify({"msg": "Administration rights required"}), 403
         datamanager.delete_from_database(User, user_id)
         return jsonify({"message": "User deleted successfully"})

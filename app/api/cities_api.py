@@ -3,6 +3,8 @@ from models.city import City
 from persistence.datamanager import DataManager
 import json
 import datetime
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt, verify_jwt_in_request
+
 import os
 
 datamanager = DataManager(flag=5)
@@ -30,6 +32,14 @@ def cities():
         JSON: List of dictionaries containing details of all cities.
     """
     if request.method == "POST":
+        try:
+            verify_jwt_in_request()
+        except Exception as e:
+            return jsonify({"msg": "Missing Authorization Header"}), 401
+
+        claims = get_jwt()
+        if claims.get('is_admin') is not True:
+            return jsonify({"msg": "Administration rights required"}), 403
         city_data = request.get_json()
         if not city_data:
             return jsonify({"Error": "Problem during city creation."}), 400
@@ -128,6 +138,15 @@ def get_city(city_id):
         return jsonify({"Success": "City updated"}), 200
 
     if request.method == "DELETE":
+        try:
+            verify_jwt_in_request()
+        except Exception as e:
+            return jsonify({"msg": "Missing Authorization Header"}), 401
+
+        claims = get_jwt()
+        if claims.get('is_admin') is not True:
+            return jsonify({"msg": "Administration rights required"}), 403
+
         city = City.query.filter_by(id=city_id).first()
         if not city:
             return jsonify({"Error": "City not found"}), 404

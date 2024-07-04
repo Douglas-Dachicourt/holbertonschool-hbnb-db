@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from models.amenity import Amenity
 from persistence.datamanager import DataManager
 import json
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt, verify_jwt_in_request
 
 amenities_api = Blueprint("amenities_api", __name__)
 datamanager = DataManager(flag=3)
@@ -27,7 +28,16 @@ def add_amenity():
     Returns:
         JSON: List of dictionaries containing details of all amenities.
     """
+    
     if request.method == "POST":
+        try:
+            verify_jwt_in_request()
+        except Exception as e:
+            return jsonify({"msg": "Missing Authorization Header"}), 401
+
+        claims = get_jwt()
+        if claims.get('is_admin') is not True:
+            return jsonify({"msg": "Administration rights required"}), 403
         amenity_data = request.get_json()
 
         if not amenity_data:
@@ -104,6 +114,14 @@ def get_amenity(id):
             return jsonify({"Error": "Amenity not found"}), 404
 
     if request.method == "DELETE":
+        try:
+            verify_jwt_in_request()
+        except Exception as e:
+            return jsonify({"msg": "Missing Authorization Header"}), 401
+
+        claims = get_jwt()
+        if claims.get('is_admin') is not True:
+            return jsonify({"msg": "Administration rights required"}), 403
         if not amenities:
             return jsonify({"Error": "Amenity not found"}), 404
         else:
