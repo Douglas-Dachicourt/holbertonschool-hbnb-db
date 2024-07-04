@@ -37,7 +37,7 @@ class User(BaseModel, db.Model):
     email = Column(String(256), nullable=False, unique=True)
     first_name = Column(String(50), nullable=False)
     last_name = Column(String(50), nullable=False)
-    password = Column(String(50), nullable=False)
+    password = Column(String(256), nullable=False)
     is_admin = Column(Boolean, default=False, nullable=False)
     created_at = Column(DateTime, default=func.current_timestamp())
     updated_at = Column(DateTime, onupdate=func.current_timestamp())
