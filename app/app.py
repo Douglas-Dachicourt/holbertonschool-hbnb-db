@@ -36,7 +36,7 @@ app = Flask(__name__)
 app.config.from_object(get_config())
 
 #-------------------------------------------------------------
-app.config['JWT_SECRET_KEY'] = 'super-secret'  # Change this to a more secure key
+app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'default_jwt_secret_key')
 jwt = JWTManager(app)
 
 db.init_app(app)

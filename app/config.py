@@ -34,6 +34,8 @@ class DevelopmentConfig(Config):
 
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL',
                                              'sqlite:///development.db')
+    
+    JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', '2c1br3mt2wkkcagl68aqh5iml')
 
 
 class ProductionConfig(Config):
@@ -51,6 +53,7 @@ class ProductionConfig(Config):
     DEBUG = False
 
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+    JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
 
 
 def get_config():
