@@ -35,6 +35,7 @@ def add_or_list_users():
     from models.users import User
 
     if request.method == "POST":
+        """
         try:
             verify_jwt_in_request()
         except Exception as e:
@@ -43,6 +44,7 @@ def add_or_list_users():
         claims = get_jwt()
         if claims.get('is_admin') is not True:
             return jsonify({"msg": "Administration rights required"}), 403
+        """""
         user_data = request.get_json()
 
         if not user_data:

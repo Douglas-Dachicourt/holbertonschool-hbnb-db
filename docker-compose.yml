@@ -6,15 +6,30 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - ENV=development
-      - DATABASE_URL_FILE=/run/secrets/db_credentials
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - FLASK_ENV=${FLASK_ENV}
+    volumes:
+      - .:/home/hbnb/app
+      - hbnb_data:/home/hbnb/hbnb_data
+    depends_on:
+      - db
     secrets:
       - jwt_secret
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: prod_db
+      POSTGRES_USER: your_username
+      POSTGRES_PASSWORD: your_password
     volumes:
-      - .:/app
+      - postgres_data:/var/lib/postgresql/data
 
 secrets:
   jwt_secret:
-    external: true
-  db_credentials:
-    external: true
+    file: ./jwt_secret.txt
+
+volumes:
+  postgres_data:
+  hbnb_data:

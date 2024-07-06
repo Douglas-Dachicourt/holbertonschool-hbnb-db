@@ -21,9 +21,3 @@ def login():
                 identity={'username': email, 'role': user.is_admin}, additional_claims=additional_claims)
             return jsonify(access_token=access_token)
     return jsonify({"error": "Invalid credentials"}), 401
-
-@auth.route('/protected', methods=['GET'])
-@jwt_required()
-def protected():
-    current_user = get_jwt_identity()
-    return jsonify(logged_in_as=current_user), 200
