@@ -1,8 +1,8 @@
-# HBNB Project
+# HBNB Project part 2
 
 ## Description
 
-The HBNB project is part of the Holberton School curriculum. It aims to create a basic replica of an Airbnb-like application, allowing CRUD operations (Create, Read, Update, Delete) on a JSON file-based database via HTTP requests.
+The HBNB project is part of the Holberton School curriculum. It aims to create a basic replica of an Airbnb-like application, allowing CRUD operations (Create, Read, Update, Delete) on two different databases : sqlite for development mode, postgresql for production mode.
 
 ## Features
 
@@ -10,6 +10,7 @@ The HBNB project is part of the Holberton School curriculum. It aims to create a
 - Add, modify, or delete rental places.
 - Create, modify, or delete amenities for a place.
 - Post, update, or delete reviews for places.
+- Save API and interact with on sqlite/postgres databases.
 
 ## Technologies Used
 
@@ -39,41 +40,54 @@ The HBNB project is part of the Holberton School curriculum. It aims to create a
 1. **Clone the repository**
 
     ```sh
-    git clone https://github.com/niranois13/holbertonschool-hbnb.git
-    cd holbertonschool-hbnb
+    git clone https://github.com/Douglas-Dachicourt/holbertonschool-hbnb-db
+    cd holbertonschool-hbnb-db
     ```
 
-2. **Build the Docker image**
+2. **Test sqlite or postgresSQL databases**
+
+    - SQLITE/POSTGRESSQL => development database/production <br>
+    <t> You have to edit the .env file first to make sure the mode you want is active (uncomment the mode you need): <br>
+    <br>
+    *EXEMPLE*
+
+     ```sh
+    # development mode, sqlite
+    ENV=development
+    DATABASE_TYPE=sqlite
+    DATABASE_URL=sqlite:///development.db
+
+    # production mode, postgres
+    #ENV=production
+    #DATABASE_TYPE=postgresql
+    #DATABASE_URL=postgresql://maxdoug:projet2@localhost/production
+
+    JWT_SECRET_KEY= 2c1br3mt2wkkcagl68aqh5iml
+    ```
+ => THEN RUN THE server with the following line command `python app/app.py` <br>
+
+3. **Build the Docker image**
 
     ```sh
     docker image build . -t "hbnb"
     ```
 
-3. **Run the Docker container**
+4. **Run the Docker container**
 
-    By default, the application runs on port 5000.
+    By default, the application runs on port 8000.
 
     ```sh
-    docker run -t -it 80:5000 -v hbnb_data:/home/hbnb/hbnb_data hbnb
+    docker run -d -p 8000:8000 -v hbnb_data:/home/hbnb/hbnb_data hbnb
     ```
 
-    To run the application directly with GitHub:
-
-    ```sh
-    docker run -t -p 80:5000 -v hbnb_data:/hbnb_data --pull=always ghcr.io/niranois13/holbertonschool-hbnb:latest
-    ```
-
-    To execute the container in interactive mode.
-    ```sh
-    docker exec -it <contenair-id> sh
     ```
 
     To launch the unittest
     ``` sh
-     python3 -m unittest tests/test_amenities.py
-     python3 -m unittest tests/test_city.py
+     python3 -m unittest tests/test_auth.py
+     python3 -m unittest tests/test_db_sqlite_operations.py
+     ...
     ```
-
 
 
 ## Usage
@@ -82,9 +96,8 @@ Once the container is running, you can access the API at `http://localhost`.
 
 API documentation is available here:
 
-`http://localhost/api/docs`
+`http://localhost/api/docs` 
 
-If needed, replace `http://localhost` with the machine's IP address `http://ip`
 
 ## Contributors
 
